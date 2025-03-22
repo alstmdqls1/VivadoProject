@@ -3,9 +3,9 @@
 // Company: 
 // Engineer: 
 // 
-// Create Date: 2025/02/19 10:03:49
+// Create Date: 2025/02/27 16:34:16
 // Design Name: 
-// Module Name: Phase_Counter_sim
+// Module Name: RingCounterSim
 // Project Name: 
 // Target Devices: 
 // Tool Versions: 
@@ -20,21 +20,30 @@
 //////////////////////////////////////////////////////////////////////////////////
 
 
-module Phase_Counter_sim#(
-    parameter integer WIDTH     = 16      // 카운터 비트 폭
-    )();
-    reg CLK = 1;
-    reg [WIDTH-1:0] increment_value = 32;  // 증가(감소)량
-    wire [WIDTH-1:0] count_out;
+module CircularCounterSim(
+        
+    );
     
-    ring_counter ring_counter(
-    .increment_value(increment_value),
-    .CLK(CLK),
+    reg clk = 1;
+    reg sclr;
+    reg [31:0]cnt;
+    wire[31:0] count_out;
+    
+    CircularCounter32bit CircularCounter32bit_inst(
+    .CLK(clk),
+    .SCLR(sclr),
+    .increment_value(cnt),
     .count_out(count_out)
     );
-   
-   always begin
-        #5 CLK =~ CLK;
-   end
-endmodule
     
+    initial begin
+        sclr = 1;
+        #10 sclr = 0;
+        cnt = 4000;
+     end
+        
+    always begin
+        #5 clk = ~clk;
+    end
+    
+endmodule

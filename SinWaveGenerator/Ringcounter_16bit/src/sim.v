@@ -3,9 +3,9 @@
 // Company: 
 // Engineer: 
 // 
-// Create Date: 2025/02/21 15:49:12
+// Create Date: 2025/02/27 17:55:19
 // Design Name: 
-// Module Name: float32_to_uint32_sim
+// Module Name: sim
 // Project Name: 
 // Target Devices: 
 // Tool Versions: 
@@ -20,28 +20,26 @@
 //////////////////////////////////////////////////////////////////////////////////
 
 
-module float32_to_uint32_sim(
+module sim(
 
     );
     reg clk = 1;
-    reg rst_n;
-    reg in_valid;
-    reg[31:0] float_in;
-    wire[31:0] out_data;
-    wire out_valid;
+    reg SCLR;
+    reg[15:0] increment_value;
+    wire [15:0] phase_out;
     
-    float32_to_uint32 float32_to_uint32(
-    .aclk(clk),
-    .aresetn(rst_n),
-    .float_in(float_in),
-    .out_data(out_data)
+    RingCounter_16bit ringcounter(
+    .CLK(clk),
+    .SCLR(SCLR),
+    .increment_value(increment_value),
+    .count_out(phase_out)
     );
     
     initial begin
-        rst_n = 0;
-        #5 in_valid = 1;
-        rst_n = 1;
-        float_in = 32'b01000101000100000110000000000000;
+        SCLR = 1;
+        #20 SCLR = 0;
+        
+        increment_value = 400;
     end
     
     always begin

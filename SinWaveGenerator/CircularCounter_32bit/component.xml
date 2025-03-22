@@ -2,27 +2,11 @@
 <spirit:component xmlns:xilinx="http://www.xilinx.com" xmlns:spirit="http://www.spiritconsortium.org/XMLSchema/SPIRIT/1685-2009" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
   <spirit:vendor>xilinx.com</spirit:vendor>
   <spirit:library>user</spirit:library>
-  <spirit:name>float32_to_uint32</spirit:name>
+  <spirit:name>CircularCounter32bit</spirit:name>
   <spirit:version>1.0</spirit:version>
   <spirit:busInterfaces>
     <spirit:busInterface>
-      <spirit:name>rst</spirit:name>
-      <spirit:busType spirit:vendor="xilinx.com" spirit:library="signal" spirit:name="reset" spirit:version="1.0"/>
-      <spirit:abstractionType spirit:vendor="xilinx.com" spirit:library="signal" spirit:name="reset_rtl" spirit:version="1.0"/>
-      <spirit:slave/>
-      <spirit:portMaps>
-        <spirit:portMap>
-          <spirit:logicalPort>
-            <spirit:name>RST</spirit:name>
-          </spirit:logicalPort>
-          <spirit:physicalPort>
-            <spirit:name>rst</spirit:name>
-          </spirit:physicalPort>
-        </spirit:portMap>
-      </spirit:portMaps>
-    </spirit:busInterface>
-    <spirit:busInterface>
-      <spirit:name>aclk</spirit:name>
+      <spirit:name>CLK</spirit:name>
       <spirit:busType spirit:vendor="xilinx.com" spirit:library="signal" spirit:name="clock" spirit:version="1.0"/>
       <spirit:abstractionType spirit:vendor="xilinx.com" spirit:library="signal" spirit:name="clock_rtl" spirit:version="1.0"/>
       <spirit:slave/>
@@ -32,16 +16,32 @@
             <spirit:name>CLK</spirit:name>
           </spirit:logicalPort>
           <spirit:physicalPort>
-            <spirit:name>aclk</spirit:name>
+            <spirit:name>CLK</spirit:name>
           </spirit:physicalPort>
         </spirit:portMap>
       </spirit:portMaps>
       <spirit:parameters>
         <spirit:parameter>
           <spirit:name>ASSOCIATED_RESET</spirit:name>
-          <spirit:value spirit:id="BUSIFPARAM_VALUE.ACLK.ASSOCIATED_RESET">rst</spirit:value>
+          <spirit:value spirit:id="BUSIFPARAM_VALUE.CLK.ASSOCIATED_RESET">SCLR</spirit:value>
         </spirit:parameter>
       </spirit:parameters>
+    </spirit:busInterface>
+    <spirit:busInterface>
+      <spirit:name>SCLR</spirit:name>
+      <spirit:busType spirit:vendor="xilinx.com" spirit:library="signal" spirit:name="reset" spirit:version="1.0"/>
+      <spirit:abstractionType spirit:vendor="xilinx.com" spirit:library="signal" spirit:name="reset_rtl" spirit:version="1.0"/>
+      <spirit:slave/>
+      <spirit:portMaps>
+        <spirit:portMap>
+          <spirit:logicalPort>
+            <spirit:name>RST</spirit:name>
+          </spirit:logicalPort>
+          <spirit:physicalPort>
+            <spirit:name>SCLR</spirit:name>
+          </spirit:physicalPort>
+        </spirit:portMap>
+      </spirit:portMaps>
     </spirit:busInterface>
   </spirit:busInterfaces>
   <spirit:model>
@@ -51,14 +51,14 @@
         <spirit:displayName>Synthesis</spirit:displayName>
         <spirit:envIdentifier>:vivado.xilinx.com:synthesis</spirit:envIdentifier>
         <spirit:language>Verilog</spirit:language>
-        <spirit:modelName>float32_to_uint32</spirit:modelName>
+        <spirit:modelName>CircularCounter32bit</spirit:modelName>
         <spirit:fileSetRef>
           <spirit:localName>xilinx_anylanguagesynthesis_view_fileset</spirit:localName>
         </spirit:fileSetRef>
         <spirit:parameters>
           <spirit:parameter>
             <spirit:name>viewChecksum</spirit:name>
-            <spirit:value>d7b22dac</spirit:value>
+            <spirit:value>3eb02de2</spirit:value>
           </spirit:parameter>
         </spirit:parameters>
       </spirit:view>
@@ -67,14 +67,14 @@
         <spirit:displayName>Simulation</spirit:displayName>
         <spirit:envIdentifier>:vivado.xilinx.com:simulation</spirit:envIdentifier>
         <spirit:language>Verilog</spirit:language>
-        <spirit:modelName>float32_to_uint32</spirit:modelName>
+        <spirit:modelName>CircularCounter32bit</spirit:modelName>
         <spirit:fileSetRef>
           <spirit:localName>xilinx_anylanguagebehavioralsimulation_view_fileset</spirit:localName>
         </spirit:fileSetRef>
         <spirit:parameters>
           <spirit:parameter>
             <spirit:name>viewChecksum</spirit:name>
-            <spirit:value>d7b22dac</spirit:value>
+            <spirit:value>3eb02de2</spirit:value>
           </spirit:parameter>
         </spirit:parameters>
       </spirit:view>
@@ -82,14 +82,14 @@
         <spirit:name>xilinx_testbench</spirit:name>
         <spirit:displayName>Test Bench</spirit:displayName>
         <spirit:envIdentifier>:vivado.xilinx.com:simulation.testbench</spirit:envIdentifier>
-        <spirit:modelName>float32_to_uint32_sim</spirit:modelName>
+        <spirit:modelName>CircularCounterSim</spirit:modelName>
         <spirit:fileSetRef>
           <spirit:localName>xilinx_testbench_view_fileset</spirit:localName>
         </spirit:fileSetRef>
         <spirit:parameters>
           <spirit:parameter>
             <spirit:name>viewChecksum</spirit:name>
-            <spirit:value>5c117f3d</spirit:value>
+            <spirit:value>a5c2d2fa</spirit:value>
           </spirit:parameter>
         </spirit:parameters>
       </spirit:view>
@@ -103,14 +103,14 @@
         <spirit:parameters>
           <spirit:parameter>
             <spirit:name>viewChecksum</spirit:name>
-            <spirit:value>191e0262</spirit:value>
+            <spirit:value>bad81e80</spirit:value>
           </spirit:parameter>
         </spirit:parameters>
       </spirit:view>
     </spirit:views>
     <spirit:ports>
       <spirit:port>
-        <spirit:name>aclk</spirit:name>
+        <spirit:name>CLK</spirit:name>
         <spirit:wire>
           <spirit:direction>in</spirit:direction>
           <spirit:wireTypeDefs>
@@ -123,7 +123,7 @@
         </spirit:wire>
       </spirit:port>
       <spirit:port>
-        <spirit:name>rst</spirit:name>
+        <spirit:name>SCLR</spirit:name>
         <spirit:wire>
           <spirit:direction>in</spirit:direction>
           <spirit:wireTypeDefs>
@@ -136,11 +136,11 @@
         </spirit:wire>
       </spirit:port>
       <spirit:port>
-        <spirit:name>float_in</spirit:name>
+        <spirit:name>increment_value</spirit:name>
         <spirit:wire>
           <spirit:direction>in</spirit:direction>
           <spirit:vector>
-            <spirit:left spirit:format="long">31</spirit:left>
+            <spirit:left spirit:format="long" spirit:resolve="dependent" spirit:dependency="(spirit:decode(id(&apos;MODELPARAM_VALUE.WIDTH&apos;)) - 1)">31</spirit:left>
             <spirit:right spirit:format="long">0</spirit:right>
           </spirit:vector>
           <spirit:wireTypeDefs>
@@ -153,45 +153,70 @@
         </spirit:wire>
       </spirit:port>
       <spirit:port>
-        <spirit:name>out_data</spirit:name>
+        <spirit:name>count_out</spirit:name>
         <spirit:wire>
           <spirit:direction>out</spirit:direction>
           <spirit:vector>
-            <spirit:left spirit:format="long">31</spirit:left>
+            <spirit:left spirit:format="long" spirit:resolve="dependent" spirit:dependency="(spirit:decode(id(&apos;MODELPARAM_VALUE.WIDTH&apos;)) - 1)">31</spirit:left>
             <spirit:right spirit:format="long">0</spirit:right>
           </spirit:vector>
           <spirit:wireTypeDefs>
             <spirit:wireTypeDef>
-              <spirit:typeName>wire</spirit:typeName>
+              <spirit:typeName>reg</spirit:typeName>
               <spirit:viewNameRef>xilinx_anylanguagesynthesis</spirit:viewNameRef>
               <spirit:viewNameRef>xilinx_anylanguagebehavioralsimulation</spirit:viewNameRef>
             </spirit:wireTypeDef>
           </spirit:wireTypeDefs>
+          <spirit:driver>
+            <spirit:defaultValue spirit:format="long" spirit:resolve="dependent" spirit:dependency="spirit:decode(id(&apos;MODELPARAM_VALUE.START_VAL&apos;))">0x1FFFFFFF</spirit:defaultValue>
+          </spirit:driver>
         </spirit:wire>
       </spirit:port>
     </spirit:ports>
     <spirit:modelParameters>
       <spirit:modelParameter xsi:type="spirit:nameValueTypeType" spirit:dataType="integer">
-        <spirit:name>PIPELINE_STAGES</spirit:name>
-        <spirit:displayName>Pipeline Stages</spirit:displayName>
-        <spirit:value spirit:format="long" spirit:resolve="generated" spirit:id="MODELPARAM_VALUE.PIPELINE_STAGES">3</spirit:value>
+        <spirit:name>WIDTH</spirit:name>
+        <spirit:displayName>Width</spirit:displayName>
+        <spirit:value spirit:format="long" spirit:resolve="generated" spirit:id="MODELPARAM_VALUE.WIDTH">32</spirit:value>
+      </spirit:modelParameter>
+      <spirit:modelParameter spirit:dataType="integer">
+        <spirit:name>START_VAL</spirit:name>
+        <spirit:displayName>Start Val</spirit:displayName>
+        <spirit:value spirit:format="bitString" spirit:resolve="generated" spirit:id="MODELPARAM_VALUE.START_VAL" spirit:bitStringLength="32">0x1FFFFFFF</spirit:value>
+      </spirit:modelParameter>
+      <spirit:modelParameter spirit:dataType="integer">
+        <spirit:name>END_VAL</spirit:name>
+        <spirit:displayName>End Val</spirit:displayName>
+        <spirit:value spirit:format="bitString" spirit:resolve="generated" spirit:id="MODELPARAM_VALUE.END_VAL" spirit:bitStringLength="32">0xE0000000</spirit:value>
+      </spirit:modelParameter>
+      <spirit:modelParameter spirit:dataType="integer">
+        <spirit:name>DIRECTION</spirit:name>
+        <spirit:displayName>Direction</spirit:displayName>
+        <spirit:value spirit:format="long" spirit:resolve="generated" spirit:id="MODELPARAM_VALUE.DIRECTION">0</spirit:value>
       </spirit:modelParameter>
     </spirit:modelParameters>
   </spirit:model>
+  <spirit:choices>
+    <spirit:choice>
+      <spirit:name>choice_pairs_56383769</spirit:name>
+      <spirit:enumeration spirit:text="Up">1</spirit:enumeration>
+      <spirit:enumeration spirit:text="Down">0</spirit:enumeration>
+    </spirit:choice>
+  </spirit:choices>
   <spirit:fileSets>
     <spirit:fileSet>
       <spirit:name>xilinx_anylanguagesynthesis_view_fileset</spirit:name>
       <spirit:file>
-        <spirit:name>src/float32_to_uint32.v</spirit:name>
+        <spirit:name>src/RingCounter32bit.v</spirit:name>
         <spirit:fileType>verilogSource</spirit:fileType>
-        <spirit:userFileType>CHECKSUM_d7b22dac</spirit:userFileType>
+        <spirit:userFileType>CHECKSUM_3eb02de2</spirit:userFileType>
         <spirit:userFileType>IMPORTED_FILE</spirit:userFileType>
       </spirit:file>
     </spirit:fileSet>
     <spirit:fileSet>
       <spirit:name>xilinx_anylanguagebehavioralsimulation_view_fileset</spirit:name>
       <spirit:file>
-        <spirit:name>src/float32_to_uint32.v</spirit:name>
+        <spirit:name>src/RingCounter32bit.v</spirit:name>
         <spirit:fileType>verilogSource</spirit:fileType>
         <spirit:userFileType>IMPORTED_FILE</spirit:userFileType>
       </spirit:file>
@@ -199,7 +224,7 @@
     <spirit:fileSet>
       <spirit:name>xilinx_testbench_view_fileset</spirit:name>
       <spirit:file>
-        <spirit:name>src/float32_to_uint32_sim.v</spirit:name>
+        <spirit:name>src/RingCounterSim.v</spirit:name>
         <spirit:fileType>verilogSource</spirit:fileType>
         <spirit:userFileType>IMPORTED_FILE</spirit:userFileType>
         <spirit:userFileType>USED_IN_implementation</spirit:userFileType>
@@ -210,23 +235,38 @@
     <spirit:fileSet>
       <spirit:name>xilinx_xpgui_view_fileset</spirit:name>
       <spirit:file>
-        <spirit:name>xgui/float32_to_uint32_v1_0.tcl</spirit:name>
+        <spirit:name>xgui/CircularCounter32bit_v1_0.tcl</spirit:name>
         <spirit:fileType>tclSource</spirit:fileType>
-        <spirit:userFileType>CHECKSUM_191e0262</spirit:userFileType>
+        <spirit:userFileType>CHECKSUM_bad81e80</spirit:userFileType>
         <spirit:userFileType>XGUI_VERSION_2</spirit:userFileType>
       </spirit:file>
     </spirit:fileSet>
   </spirit:fileSets>
-  <spirit:description>float32_to_uint32_v1_0</spirit:description>
+  <spirit:description>CircularCounter32bit_v1_0</spirit:description>
   <spirit:parameters>
     <spirit:parameter>
-      <spirit:name>PIPELINE_STAGES</spirit:name>
-      <spirit:displayName>Pipeline Stages</spirit:displayName>
-      <spirit:value spirit:format="long" spirit:resolve="user" spirit:id="PARAM_VALUE.PIPELINE_STAGES">3</spirit:value>
+      <spirit:name>WIDTH</spirit:name>
+      <spirit:displayName>Width</spirit:displayName>
+      <spirit:value spirit:format="long" spirit:resolve="user" spirit:id="PARAM_VALUE.WIDTH">32</spirit:value>
+    </spirit:parameter>
+    <spirit:parameter>
+      <spirit:name>START_VAL</spirit:name>
+      <spirit:displayName>Start Val</spirit:displayName>
+      <spirit:value spirit:format="bitString" spirit:resolve="user" spirit:id="PARAM_VALUE.START_VAL" spirit:bitStringLength="32">0x1FFFFFFF</spirit:value>
+    </spirit:parameter>
+    <spirit:parameter>
+      <spirit:name>END_VAL</spirit:name>
+      <spirit:displayName>End Val</spirit:displayName>
+      <spirit:value spirit:format="bitString" spirit:resolve="user" spirit:id="PARAM_VALUE.END_VAL" spirit:bitStringLength="32">0xE0000000</spirit:value>
+    </spirit:parameter>
+    <spirit:parameter>
+      <spirit:name>DIRECTION</spirit:name>
+      <spirit:displayName>Direction</spirit:displayName>
+      <spirit:value spirit:format="long" spirit:resolve="user" spirit:id="PARAM_VALUE.DIRECTION" spirit:choiceRef="choice_pairs_56383769">0</spirit:value>
     </spirit:parameter>
     <spirit:parameter>
       <spirit:name>Component_Name</spirit:name>
-      <spirit:value spirit:resolve="user" spirit:id="PARAM_VALUE.Component_Name" spirit:order="1">float32_to_uint32_v1_0</spirit:value>
+      <spirit:value spirit:resolve="user" spirit:id="PARAM_VALUE.Component_Name" spirit:order="1">CircularCounter32bit_v1_0</spirit:value>
     </spirit:parameter>
   </spirit:parameters>
   <spirit:vendorExtensions>
@@ -244,18 +284,23 @@
       <xilinx:taxonomies>
         <xilinx:taxonomy>/UserIP</xilinx:taxonomy>
       </xilinx:taxonomies>
-      <xilinx:displayName>float32_to_uint32_v1_0</xilinx:displayName>
+      <xilinx:displayName>CircularCounter32bit_v1_0</xilinx:displayName>
       <xilinx:definitionSource>package_project</xilinx:definitionSource>
       <xilinx:coreRevision>2</xilinx:coreRevision>
-      <xilinx:coreCreationDateTime>2025-03-06T13:46:19Z</xilinx:coreCreationDateTime>
+      <xilinx:coreCreationDateTime>2025-03-07T01:40:08Z</xilinx:coreCreationDateTime>
     </xilinx:coreExtensions>
     <xilinx:packagingInfo>
       <xilinx:xilinxVersion>2023.1</xilinx:xilinxVersion>
-      <xilinx:checksum xilinx:scope="busInterfaces" xilinx:value="9a7925e1"/>
-      <xilinx:checksum xilinx:scope="fileGroups" xilinx:value="0c8a0d8d"/>
-      <xilinx:checksum xilinx:scope="ports" xilinx:value="039a6954"/>
-      <xilinx:checksum xilinx:scope="hdlParameters" xilinx:value="3dbf454c"/>
-      <xilinx:checksum xilinx:scope="parameters" xilinx:value="aa2683c1"/>
+      <xilinx:checksum xilinx:scope="busInterfaces" xilinx:value="d54ad389"/>
+      <xilinx:checksum xilinx:scope="fileGroups" xilinx:value="5e20f9e0"/>
+      <xilinx:checksum xilinx:scope="ports" xilinx:value="f1e42d6e"/>
+      <xilinx:checksum xilinx:scope="hdlParameters" xilinx:value="62e9fcfd"/>
+      <xilinx:checksum xilinx:scope="parameters" xilinx:value="9cf83c52"/>
+      <xilinx:targetDRCs>
+        <xilinx:targetDRC xilinx:tool="ipi">
+          <xilinx:targetDRCOption xilinx:name="ignore_freq_hz" xilinx:value="false"/>
+        </xilinx:targetDRC>
+      </xilinx:targetDRCs>
     </xilinx:packagingInfo>
   </spirit:vendorExtensions>
 </spirit:component>

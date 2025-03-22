@@ -32,7 +32,7 @@ module FtoU14(
     .aclk(clk),
     .float_in(float_in),
     .out_data(out_data),
-    .aresetn(1)
+    .rst(0)
     );
     
     initial begin

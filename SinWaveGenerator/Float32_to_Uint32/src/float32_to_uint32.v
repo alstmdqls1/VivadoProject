@@ -4,7 +4,7 @@ module float32_to_uint32 #(
     parameter integer PIPELINE_STAGES = 3
 )(
     input  wire         aclk,
-    input  wire         aresetn,
+    input  wire         rst,
 
     // 입력 및 출력 데이터
     input  wire [31:0]  float_in,
@@ -55,8 +55,8 @@ module float32_to_uint32 #(
     //---------------------------------------------------------------
     // 파이프라인 메인 always 블록
     //---------------------------------------------------------------
-    always @(posedge aclk or negedge aresetn) begin
-        if (!aresetn) begin
+    always @(posedge aclk or posedge rst) begin
+        if (rst) begin
             //------------------------- Reset -------------------------
             valid_pipe      <= 0;
 
