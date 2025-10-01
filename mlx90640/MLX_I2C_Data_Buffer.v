@@ -7,7 +7,8 @@ module MLX_I2C_Data_Buffer (
     input  wire [7:0]  cmd,           // 0 = READ
     input  wire [7:0]  slaveAddr,     // 7-bit in [6:0]
     input  wire [15:0] regAddr,
-    input  wire [31:0] length,
+    input  wire [15:0] reg_val,
+    input  wire [15:0] length,
     input  wire        trig_in,
     input  wire        mlx_clk,       // observe-only (not used for timing)
     input  wire        debug_input,   // unused
@@ -58,7 +59,7 @@ module MLX_I2C_Data_Buffer (
     reg s_data_valid_internal;
     reg m_data_valid_internal;
     reg data_window_internal;
-    reg [31:0] length_internal;
+    reg [15:0] length_internal;
     
     reg [2:0] next_state;
     reg [2:0] i2c_state;
@@ -74,7 +75,7 @@ module MLX_I2C_Data_Buffer (
     reg [1:0] scl_state;
 
     reg [3:0] access_byte_length;
-    reg [31:0] read_byte_length;
+    reg [15:0] read_byte_length;
     reg [3:0] write_byte_length;
     
     reg [7:0] bit_cnt;
@@ -85,6 +86,10 @@ module MLX_I2C_Data_Buffer (
     reg master_nack_req;
     reg slave_ack_req;
     reg cmd_seq;    
+    reg write_req;
+    
+    reg [7:0] write_byte_high;
+    reg [7:0] write_byte_low;
     
     wire trig_rise = trig_in & ~trig_internal;
     
@@ -121,7 +126,7 @@ module MLX_I2C_Data_Buffer (
             m_data_internal <= 1'b1;
             m_data_valid_internal <= 1'b1;
             s_data_valid_internal <= 1'b0;
-            length_internal <= 32'b0;
+            length_internal <= 16'b0;
             data_window_internal <= 1'b0;
             clk_out_internal <= 1'b1;
             scl_state <= SCL_HIGH;
@@ -138,23 +143,31 @@ module MLX_I2C_Data_Buffer (
             tx_byte <= 1'b0;
             bit_seg <= DATA_INIT;
             cmd_seq <= 1'b0;
+            write_req <= 1'b0;
             
             access_byte_length <= 3'd2;
-            read_byte_length <= 32'd2 + length_internal;
+            read_byte_length <= 16'd2 + length_internal;
             write_byte_length <= 3'd0;
             
             master_nack_req <= 1'b0;
             slave_ack_req <= 1'b0;
             
+            write_byte_high <= 1'b0;
+            write_byte_low <= 1'b0;
+            
             keep_read_sequence <= 1'b0;
         end else begin
             // STATE_IDLE
-            length_internal <= length;
             if (i2c_state == STATE_IDLE) begin
                 scl_state <= SCL_HIGH;
                 m_data_internal <= 1'b1;
                 m_data_valid_internal <= 1'b0;
                 s_data_valid_internal <= 1'b0;
+                
+            length_internal <= length;
+            cmd_seq <= cmd[1:0];
+            write_byte_high <= reg_val[15:8];
+            write_byte_low <= reg_val[7:0];
             end else begin
             
             end
@@ -220,11 +233,11 @@ module MLX_I2C_Data_Buffer (
                                     end else begin
                                     case (cmd_seq)
                                         READ_SEQUENCE  : begin
-                                            restart_req         <= 1'b1;
-                                            keep_read_sequence  <= 1'b1;
+                                            restart_req <= 1'b1;
+                                            keep_read_sequence <= 1'b1;
                                         end
                                         WRITE_SEQUENCE : begin
-                                            data_state          <= DATA_WRITE;
+                                            write_req <= 1'b1;
                                         end
                                     endcase
                                     end
@@ -238,13 +251,19 @@ module MLX_I2C_Data_Buffer (
                                 m_data_internal <= 1'b1;
                                 m_data_valid_internal <= 1'b0;
                                 s_data_valid_internal <= 1'b1;
-                                scl_state <= SCL_ACTIVE;                            
+                                scl_state <= SCL_ACTIVE;
                                 case(access_byte_length)
-                                    4'd2 : tx_byte <= {slaveAddr[6:0], 1'b0};
                                     4'd1 : tx_byte <= regAddr[15:8];
                                     4'd0 : tx_byte <= regAddr[7:0];
                                 endcase
-                                bit_seg <= DATA_SLOT;
+                                if(!write_req) begin
+                                    bit_seg <= DATA_SLOT;
+                                end else begin
+                                    data_state <= DATA_WRITE;
+                                    bit_seg <= DATA_SLOT;
+                                    write_req <= 1'b0;
+                                    write_byte_length <= 3'b1;
+                                end
                             end
                         endcase
                     end 
@@ -312,41 +331,55 @@ module MLX_I2C_Data_Buffer (
     
                     DATA_WRITE : begin
                         case (bit_seg)
-                            DATA_INIT : begin
-                                
-                            end
                             DATA_SLOT : begin
-                                if (write_byte_length > 0) begin
-                                    write_byte_length <= write_byte_length - 1;
+                                if(bit_cnt > 0) begin
+                                    bit_cnt <= bit_cnt - 1'b1;
                                 end else begin
-                                    // 원본: 비워둠
+                                    bit_cnt <= 3'd7;
+                                    bit_seg <= ACK_SLOT;
+                                    if(write_byte_length > 0) begin
+                                        write_byte_length <= write_byte_length - 1'b1;
+                                    end else begin
+                                        data_done <= 1'b1;
+                                    end
                                 end
+                                
+                                if(write_byte_length[0]) begin
+                                   m_data_internal <= write_byte_high[bit_cnt];
+                                end else begin
+                                    m_data_internal <= write_byte_low[bit_cnt];
+                                end
+                                
+                                m_data_valid_internal <= 1'b1;
+                                s_data_valid_internal <= 1'b0;
+                                scl_state <= SCL_ACTIVE;
                             end
                             ACK_SLOT : begin
-                                if (write_byte_length > 0) begin
-                                    // Listen ACK (원본: 비워둠)
-                                end else begin
-                                    // Listen ACK
-                                    data_done <= 1'b1; // 원본 유지
-                                end
+                                bit_seg <= DATA_SLOT;
+                                
+                                m_data_internal <= 1'b1;
+                                m_data_valid_internal <= 1'b0;
+                                s_data_valid_internal <= 1'b1;
+                                scl_state <= SCL_ACTIVE;
                             end
                         endcase
                     end
                 endcase
             end else begin
-                bit_cnt             <= 3'd7;
+                bit_cnt <= 3'd7;
                 bit_seg <= DATA_INIT;
                 master_nack_req <= 1'b0;
                 slave_ack_req <= 1'b0;
-                restart_req            <= 1'b0;
-                data_done              <= 1'b0;
+                restart_req <= 1'b0;
+                write_req <= 1'b0;
+                data_done <= 1'b0;
                 if (!keep_read_sequence) begin
-                    data_state          <= DATA_ACCESS;
-                    access_byte_length  <= 3'd2;
-                    read_byte_length    <= 32'd2 + length_internal;
-                    write_byte_length   <= 3'd1;
+                    data_state <= DATA_ACCESS;
+                    access_byte_length <= 3'd2;
+                    read_byte_length <= 16'd2 + length_internal;
+                    write_byte_length <= 3'd1;
                 end else begin
-                    data_state          <= DATA_READ;
+                    data_state <= DATA_READ;
                 end
             end
     
@@ -389,7 +422,6 @@ module MLX_I2C_Data_Buffer (
         end else begin
             i2c_state <= next_state;
             trig_internal <= trig_in;
-            cmd_seq <= cmd[1:0]; 
         end
     end
     
